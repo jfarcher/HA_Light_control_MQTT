@@ -25,14 +25,14 @@ PubSubClient client( MQTT_SERVER, 1883, callback, ethClient); // MQTT object
 
 void setup() {
   Serial.begin(9600);
-  Ethernet.begin(mac,ip,gateway,subnet);  // Get connected!
-  Serial.print("IP: ");                       // A little debug.. show IP address
+  Ethernet.begin(mac,ip,gateway,subnet); 
+  Serial.print("Network connected: ");     
   Serial.println(Ethernet.localIP());
 
-  if (client.connect("arduinoClient")) {      // connect to MQTT server
+  if (client.connect("arduinoClient")) {      // connecting to MQTT server
     client.subscribe("device/1/led");             // subscribe to topic for led 1
     client.subscribe("device/0/led");             // subscribe to topic for led 0
-    Serial.println("Connected to MQTT");      // let us know this has happened
+    Serial.println("Connected to MQTT");      // Milestone for connection debugging
   }
   pinMode( led1Pin, OUTPUT);
   pinMode( led0Pin, OUTPUT);
@@ -45,6 +45,8 @@ void loop()
 }
 
 // handles message arrived on subscribed topic
+//Serial prints are for debugging purposes and can safely be removed
+//not sure what is going on with the suffixed d on the payloads, need to work that one out.
 void callback(char* topic, byte* payload, unsigned int length) {
   if (strcmp(topic,"device/1/led")==0) {
 Serial.println((char*)payload);
