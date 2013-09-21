@@ -1,5 +1,5 @@
 /*
- * Ethernet LED on or Off with MQTT 
+ * Digital pin On or Off based on MQTT message
  * (c) 2013 Jon Archer
  *
  */
@@ -46,12 +46,7 @@ void loop()
 
 // handles message arrived on subscribed topic
 void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print ("New message from broker on:");
-  Serial.println (topic);
-  Serial.print("Payload:");
-  Serial.write(payload, length);
-  Serial.println();
-if (strcmp(topic,"device/1/led")==0) {
+  if (strcmp(topic,"device/1/led")==0) {
 Serial.println((char*)payload);
     if (strcmp((char*)payload,"2-42d")==0){
       Serial.println("2-42 pressed");
