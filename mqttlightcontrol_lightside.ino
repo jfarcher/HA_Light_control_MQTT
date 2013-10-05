@@ -19,8 +19,9 @@ IPAddress subnet(255, 255, 0, 0);
 
 char message_buff[30];
 
-int led1Pin   = 3;   // Red LED,   connected to digital pin 3
-int led0Pin  = 5;
+int led1Pin   = 6; 
+int led0Pin  = 7;
+int value; 
 
 EthernetClient ethClient;  // Ethernet object
 PubSubClient client( MQTT_SERVER, 1883, callback, ethClient); // MQTT object
@@ -101,11 +102,25 @@ if (strcmp(topic,"device/0/led")==0) {
 Serial.println((char*)payload);
     if (strcmp((char*)payload,"2-40d")==0){
       Serial.println("2-40 pressed");
-      digitalWrite(led1Pin, HIGH);
+      for(value = 0 ; value <= 255; value+=5) // fade in (from min to max) 
+      { 
+        analogWrite(led1Pin, value);           // sets the value (range from 0 to 255) 
+//        delay(30);                            // waits for 30 milli seconds to see the dimming effect 
+       } 
+
+
+       //digitalWrite(led1Pin, HIGH);
 }
    else  if (strcmp((char*)payload,"2-41d")==0){
       Serial.println("2-41 pressed");
-      digitalWrite(led1Pin, LOW);
+      for(value = 255; value >=0; value-=5)   // fade out (from max to min) 
+      { 
+        analogWrite(led1Pin, value); 
+  //      delay(30); 
+      }  
+
+
+//     digitalWrite(led1Pin, LOW);
 }
 
 }
