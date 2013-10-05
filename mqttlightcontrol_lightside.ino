@@ -17,11 +17,14 @@ IPAddress ip(192,168,1, 177);
 IPAddress gateway(192,168,1, 1);
 IPAddress subnet(255, 255, 0, 0);
 
-char message_buff[30];
 
-int led1Pin   = 6; 
-int led0Pin  = 7;
+
+int led0Pin  = 6;
+int led1Pin   = 7; 
 int value; 
+int state;
+int fadeamount;
+char message_buff[100];
 
 EthernetClient ethClient;  // Ethernet object
 PubSubClient client( MQTT_SERVER, 1883, callback, ethClient); // MQTT object
@@ -66,10 +69,11 @@ Serial.print("IP address: ");
     // print the value of each byte of the IP address:
     Serial.print(Ethernet.localIP()[thisByte], DEC);
   }
+  delay(10);
   Serial.println();
   if (client.connect("arduinoClient")) {      // connecting to MQTT server
-    client.subscribe("device/1/led");             // subscribe to topic for led 1
-    client.subscribe("device/0/led");             // subscribe to topic for led 0
+    client.subscribe("house/room1/1");             // subscribe to topic for room 1 light 1
+    client.subscribe("house/room1/2");             // subscribe to topic for room 1 light 2
     Serial.println("Connected to MQTT");      // Milestone for connection debugging
   }
   pinMode( led1Pin, OUTPUT);
@@ -86,42 +90,50 @@ void loop()
 //Serial prints are for debugging purposes and can safely be removed
 //not sure what is going on with the suffixed d on the payloads, need to work that one out.
 void callback(char* topic, byte* payload, unsigned int length) {
-  if (strcmp(topic,"device/1/led")==0) {
-Serial.println((char*)payload);
-    if (strcmp((char*)payload,"2-42d")==0){
-      Serial.println("2-42 pressed");
-      digitalWrite(led0Pin, HIGH);
-}
-   else  if (strcmp((char*)payload,"2-43d")==0){
-      Serial.println("2-43 pressed");
-      digitalWrite(led0Pin, LOW);
-}
-
-}
-if (strcmp(topic,"device/0/led")==0) {
-Serial.println((char*)payload);
-    if (strcmp((char*)payload,"2-40d")==0){
+  int i = 0;
+  for(i=0; i<length; i++) {
+    message_buff[i] = payload[i];
+  }
+  message_buff[i] = '\0';
+  String msgString = String(message_buff);
+  
+  
+  if (strcmp(topic,"house/room1/1")==0) {
+    
+//    Serial.println((char*)payload);
+    Serial.println(msgString);
+    if (msgString.equals("2-40")){
+//    if (strcmp((char*)payload,"2-402")==0){
       Serial.println("2-40 pressed");
-      for(value = 0 ; value <= 255; value+=5) // fade in (from min to max) 
+      for(value=0; value<=255; value+=5) // fade in (from min to max) 
       { 
-        analogWrite(led1Pin, value);           // sets the value (range from 0 to 255) 
-//        delay(30);                            // waits for 30 milli seconds to see the dimming effect 
-       } 
+        analogWrite(led0Pin, value);           // sets the value (range from 0 to 255) 
+        delay(50);                            // waits for 30 milli seconds to see the dimming effect 
+       }
 
-
-       //digitalWrite(led1Pin, HIGH);
+  
 }
-   else  if (strcmp((char*)payload,"2-41d")==0){
+   else     if (msgString.equals("2-41")){
       Serial.println("2-41 pressed");
       for(value = 255; value >=0; value-=5)   // fade out (from max to min) 
       { 
-        analogWrite(led1Pin, value); 
-  //      delay(30); 
+        analogWrite(led0Pin, value); 
+        delay(30); 
       }  
+}
+   else     if (msgString.equals("stat")){
+      Serial.println("status requested");
+      state = digitalRead(led0Pin);
+      if(state == 1){
+        client.publish("house/room1/1/stat","1");
+        Serial.println("Light is on");
+      }
+      else if (state == 0){
+        client.publish("house/room1/1/stat","0");
+        Serial.println("Light is off");
+      }
+    }
 
-
-//     digitalWrite(led1Pin, LOW);
 }
 
-}
 }
