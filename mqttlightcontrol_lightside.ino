@@ -99,31 +99,34 @@ void callback(char* topic, byte* payload, unsigned int length) {
   
   
   if (strcmp(topic,"house/room1/1")==0) {
-    
+  state = digitalRead(led0Pin);  
 //    Serial.println((char*)payload);
     Serial.println(msgString);
     if (msgString.equals("2-40")){
 //    if (strcmp((char*)payload,"2-402")==0){
-      Serial.println("2-40 pressed");
+  if (!state == 1){    
+  Serial.println("2-40 pressed");
       for(value=0; value<=255; value+=5) // fade in (from min to max) 
       { 
         analogWrite(led0Pin, value);           // sets the value (range from 0 to 255) 
         delay(50);                            // waits for 30 milli seconds to see the dimming effect 
        }
-
+  }
   
 }
-   else     if (msgString.equals("2-41")){
-      Serial.println("2-41 pressed");
+   else  if (msgString.equals("2-41")){
+     
+     if (!state == 0){ 
+     Serial.println("2-41 pressed");
       for(value = 255; value >=0; value-=5)   // fade out (from max to min) 
       { 
         analogWrite(led0Pin, value); 
         delay(30); 
-      }  
+      }  }
 }
    else     if (msgString.equals("stat")){
       Serial.println("status requested");
-      state = digitalRead(led0Pin);
+//      state = digitalRead(led0Pin);
       if(state == 1){
         client.publish("house/room1/1/stat","1");
         Serial.println("Light is on");
