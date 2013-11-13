@@ -15,7 +15,7 @@ byte mac[]= { 0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02 };
 OneWire ds(2);
 IPAddress ip(192,168,1, 177);
 IPAddress gateway(192,168,1, 1);
-IPAddress subnet(255, 255, 0, 0);
+IPAddress subnet(255, 255, 255, 0);
 
 
 
@@ -88,7 +88,6 @@ void loop()
 
 // handles message arrived on subscribed topic
 //Serial prints are for debugging purposes and can safely be removed
-//not sure what is going on with the suffixed d on the payloads, need to work that one out.
 void callback(char* topic, byte* payload, unsigned int length) {
   int i = 0;
   for(i=0; i<length; i++) {
