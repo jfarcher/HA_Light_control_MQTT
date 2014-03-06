@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/jfarcher/ha_light_control_mqtt.png?label=ready&title=Ready)](https://waffle.io/jfarcher/ha_light_control_mqtt)
 mqttlightcontrol_lightside
 ==========================
 
